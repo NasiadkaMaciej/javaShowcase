@@ -10,15 +10,17 @@ This repository contains programming examples that showcase software engineering
 
 ### Stack and RPN Calculator
 A Reverse Polish Notation calculator implementation featuring:
-- Generic Stack<T> data structure
+- Generic Stack data structure
 - Extensible operator system
 - Single Responsibility Principle
 - Comprehensive unit testing
 
 ### Advanced Shopping Cart
 Implementation of a flexible shopping cart system featuring:
-- Strategy pattern for payment processing
-- Decorator pattern for order enhancements  
+- Multiple and extensible discounts
+- Prromotion engine applied based on 
+- Validation system to prevent invalid operations (negative quantities, etc.)
+- Extensive unit test coverage verifying all core functionality
 - Factory method for promotion creation
 - Open/Closed Principle with extendable promotion system
 
