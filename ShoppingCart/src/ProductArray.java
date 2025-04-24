@@ -9,17 +9,11 @@ import java.util.Arrays;
 public class ProductArray {
 	private Product[] products;
 
-	public ProductArray(Product[] products) {
-		this.products = products;
-	}
+	public ProductArray(Product[] products) { this.products = products; }
 
-	public Product[] getProducts() {
-		return products;
-	}
+	public Product[] getProducts() { return products; }
 
-	public void setProducts(Product[] products) {
-		this.products = products;
-	}
+	public void setProducts(Product[] products) { this.products = products; }
 
 	public void addProduct(Product product) {
 		Product[] newProducts = Arrays.copyOf(products, products.length + 1);

@@ -81,9 +81,7 @@ public class ShoppingCart {
 	 *
 	 * @param promotion the promotion to add
 	 */
-	public void addPromotion(PromotionCommand promotion) {
-		promotions.add(promotion);
-	}
+	public void addPromotion(PromotionCommand promotion) { promotions.add(promotion); }
 
 	/**
 	 * Removes a promotion from the shopping cart and recalculates the total.
@@ -103,8 +101,7 @@ public class ShoppingCart {
 	 */
 	public double calculateTotal() {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0)
-			return 0.0;
+		if (products.length == 0) return 0.0;
 		resetDiscounts();
 
 		// Reset all promotions
@@ -117,9 +114,7 @@ public class ShoppingCart {
 			promotion.apply(productArray);
 		}
 
-		return Arrays.stream(products)
-				.mapToDouble(Product::getDiscountPrice)
-				.sum();
+		return Arrays.stream(products).mapToDouble(Product::getDiscountPrice).sum();
 	}
 
 	/**
@@ -137,9 +132,7 @@ public class ShoppingCart {
 	 * @return the total price before discounts
 	 */
 	public double getTotalBeforePromotions() {
-		return Arrays.stream(productArray.getProducts())
-				.mapToDouble(Product::getPrice)
-				.sum();
+		return Arrays.stream(productArray.getProducts()).mapToDouble(Product::getPrice).sum();
 	}
 
 	/**
@@ -149,11 +142,8 @@ public class ShoppingCart {
 	 */
 	public Product findCheapestProduct() {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0)
-			return null;
-		return Arrays.stream(products)
-				.min(Comparator.comparingDouble(Product::getPrice))
-				.orElse(null);
+		if (products.length == 0) return null;
+		return Arrays.stream(products).min(Comparator.comparingDouble(Product::getPrice)).orElse(null);
 	}
 
 	/**
@@ -163,11 +153,8 @@ public class ShoppingCart {
 	 */
 	public Product findMostExpensiveProduct() {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0)
-			return null;
-		return Arrays.stream(products)
-				.max(Comparator.comparingDouble(Product::getPrice))
-				.orElse(null);
+		if (products.length == 0) return null;
+		return Arrays.stream(products).max(Comparator.comparingDouble(Product::getPrice)).orElse(null);
 	}
 
 	/**
@@ -178,12 +165,11 @@ public class ShoppingCart {
 	 */
 	public Product[] findNCheapestProducts(int n) {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0)
-			return new Product[0];
+		if (products.length == 0) return new Product[0];
 		return Arrays.stream(products)
-				.sorted(Comparator.comparingDouble(Product::getPrice))
-				.limit(n)
-				.toArray(Product[]::new);
+		  .sorted(Comparator.comparingDouble(Product::getPrice))
+		  .limit(n)
+		  .toArray(Product[] ::new);
 	}
 
 	/**
@@ -194,12 +180,11 @@ public class ShoppingCart {
 	 */
 	public Product[] findNMostExpensiveProducts(int n) {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0)
-			return new Product[0];
+		if (products.length == 0) return new Product[0];
 		return Arrays.stream(products)
-				.sorted(Comparator.comparingDouble(Product::getPrice).reversed())
-				.limit(n)
-				.toArray(Product[]::new);
+		  .sorted(Comparator.comparingDouble(Product::getPrice).reversed())
+		  .limit(n)
+		  .toArray(Product[] ::new);
 	}
 
 	/**
@@ -207,7 +192,5 @@ public class ShoppingCart {
 	 *
 	 * @return an array of the products in the cart
 	 */
-	public Product[] getProducts() {
-		return productArray.getProducts();
-	}
+	public Product[] getProducts() { return productArray.getProducts(); }
 }

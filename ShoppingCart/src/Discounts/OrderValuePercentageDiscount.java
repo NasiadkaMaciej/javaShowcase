@@ -1,10 +1,9 @@
 package src.Discounts;
 
+import java.util.Arrays;
 import src.Product;
 import src.ProductArray;
 import src.PromotionCommand;
-
-import java.util.Arrays;
 
 /**
  * The OrderValuePercentageDiscount class implements a promotion where a
@@ -23,8 +22,9 @@ public class OrderValuePercentageDiscount implements PromotionCommand {
 	@Override
 	public void apply(ProductArray productArray) {
 		Product[] products = productArray.getProducts();
-		double total = Arrays.stream(products).mapToDouble(Product::getPrice) // Use original price for threshold check
-				.sum();
+		double total = Arrays.stream(products)
+						 .mapToDouble(Product::getPrice) // Use original price for threshold check
+						 .sum();
 
 		if (total > threshold) {
 			for (Product product : products) {
@@ -36,6 +36,5 @@ public class OrderValuePercentageDiscount implements PromotionCommand {
 	}
 
 	@Override
-	public void reset() {
-	}
+	public void reset() {}
 }

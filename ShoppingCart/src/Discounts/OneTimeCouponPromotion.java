@@ -20,9 +20,7 @@ public class OneTimeCouponPromotion implements PromotionCommand {
 
 	@Override
 	public void apply(ProductArray productArray) {
-		if (used) {
-			return;
-		}
+		if (used) { return; }
 
 		Product[] products = productArray.getProducts();
 		for (Product product : products) {

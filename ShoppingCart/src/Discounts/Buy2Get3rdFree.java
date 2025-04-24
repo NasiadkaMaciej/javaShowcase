@@ -1,24 +1,22 @@
 package src.Discounts;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import src.Product;
 import src.ProductArray;
 import src.PromotionCommand;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 /**
  * The Buy2Get3rdFree class implements a promotion where if a customer buys
- * multiple sets of 3 products, they get the cheapest product from each set for free.
+ * multiple (n) sets of 3 products, they get the n cheapest products for free.
  */
 public class Buy2Get3rdFree implements PromotionCommand {
 
 	@Override
 	public void apply(ProductArray productArray) {
 		Product[] products = productArray.getProducts();
-		if (products.length < 3)
-			return;
+		if (products.length < 3) return;
 
 		// Filter out FreeGiftPromotion products
 		List<IndexedProduct> eligibleProducts = new ArrayList<>();
@@ -29,8 +27,7 @@ public class Buy2Get3rdFree implements PromotionCommand {
 		}
 
 		// If we don't have at least 3 eligible products, exit
-		if (eligibleProducts.size() < 3)
-			return;
+		if (eligibleProducts.size() < 3) return;
 
 		// Calculate how many sets of 3 products we have from eligible products
 		int sets = eligibleProducts.size() / 3;
@@ -55,6 +52,5 @@ public class Buy2Get3rdFree implements PromotionCommand {
 	}
 
 	@Override
-	public void reset() {
-	}
+	public void reset() {}
 }

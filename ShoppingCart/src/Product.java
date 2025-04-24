@@ -13,27 +13,15 @@ public class Product {
 		this.discountPrice = price;
 	}
 
-	public String getCode() {
-		return code;
-	}
+	public String getCode() { return code; }
 
-	public String getName() {
-		return name;
-	}
+	public String getName() { return name; }
 
-	public double getPrice() {
-		return price;
-	}
+	public double getPrice() { return price; }
 
-	public double getDiscountPrice() {
-		return discountPrice;
-	}
+	public double getDiscountPrice() { return discountPrice; }
 
-	public void setDiscountPrice(double discountPrice) {
-		this.discountPrice = discountPrice;
-	}
+	public void setDiscountPrice(double discountPrice) { this.discountPrice = discountPrice; }
 
-	public void resetDiscountPrice() {
-		this.discountPrice = price;
-	}
+	public void resetDiscountPrice() { this.discountPrice = price; }
 }

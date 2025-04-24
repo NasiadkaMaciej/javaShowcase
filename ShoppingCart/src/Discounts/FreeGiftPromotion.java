@@ -1,10 +1,9 @@
 package src.Discounts;
 
+import java.util.Arrays;
 import src.Product;
 import src.ProductArray;
 import src.PromotionCommand;
-
-import java.util.Arrays;
 
 /**
  * The FreeGiftPromotion class implements a promotion where gift is given
@@ -28,9 +27,7 @@ public class FreeGiftPromotion implements PromotionCommand {
 		Product[] products = productArray.getProducts();
 
 		// Check if the total order value exceeds the threshold
-		double total = Arrays.stream(products)
-				.mapToDouble(Product::getPrice)
-				.sum();
+		double total = Arrays.stream(products).mapToDouble(Product::getPrice).sum();
 
 		if (total >= threshold && !giftAdded) {
 			// Add the gift product to the array using the wrapper
