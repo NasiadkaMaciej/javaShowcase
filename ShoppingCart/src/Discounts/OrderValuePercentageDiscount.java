@@ -7,9 +7,10 @@ import src.PromotionCommand;
 
 /**
  * The OrderValuePercentageDiscount class implements a promotion where a
- * percentage discount
- * is applied to the total order value if it exceeds a specified threshold.
+ * percentage discount is applied to the total order value if it exceeds
+ * a specified threshold.
  */
+
 public class OrderValuePercentageDiscount implements PromotionCommand {
 	private final double threshold;
 	private final double discountPercentage;
@@ -22,15 +23,12 @@ public class OrderValuePercentageDiscount implements PromotionCommand {
 	@Override
 	public void apply(ProductArray productArray) {
 		Product[] products = productArray.getProducts();
-		double total = Arrays.stream(products)
-						 .mapToDouble(Product::getPrice) // Use original price for threshold check
-						 .sum();
+		double total = Arrays.stream(products).mapToDouble(Product::getPrice).sum();
 
 		if (total > threshold) {
+			double discountFactor = 1 - (discountPercentage / 100);
 			for (Product product : products) {
-				double currentPrice = product.getDiscountPrice();
-				double discountAmount = currentPrice * (discountPercentage / 100);
-				product.setDiscountPrice(currentPrice - discountAmount);
+				product.setDiscountPrice(product.getDiscountPrice() * discountFactor);
 			}
 		}
 	}

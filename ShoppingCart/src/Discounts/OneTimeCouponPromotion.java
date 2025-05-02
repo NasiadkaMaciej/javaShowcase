@@ -22,12 +22,10 @@ public class OneTimeCouponPromotion implements PromotionCommand {
 	public void apply(ProductArray productArray) {
 		if (used) { return; }
 
-		Product[] products = productArray.getProducts();
-		for (Product product : products) {
+		for (Product product : productArray.getProducts()) {
 			if (product.getCode().equals(productCode)) {
 				double currentPrice = product.getDiscountPrice();
-				double discountAmount = currentPrice * (discountPercentage / 100);
-				product.setDiscountPrice(currentPrice - discountAmount);
+				product.setDiscountPrice(currentPrice * (1 - discountPercentage / 100));
 				used = true;
 				break;
 			}

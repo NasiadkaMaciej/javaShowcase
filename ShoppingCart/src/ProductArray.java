@@ -20,4 +20,23 @@ public class ProductArray {
 		newProducts[products.length] = product;
 		products = newProducts;
 	}
+
+	public void removeProduct(String code) {
+		int index = -1;
+		for (int i = 0; i < products.length; i++) {
+			if (products[i].getCode().equals(code)) {
+				index = i;
+				break;
+			}
+		}
+
+		if (index != -1) {
+			Product[] newProducts = new Product[products.length - 1];
+			System.arraycopy(products, 0, newProducts, 0, index);
+			System.arraycopy(products, index + 1, newProducts, index, products.length - index - 1);
+			products = newProducts;
+		}
+	}
+
+	public boolean isEmpty() { return products.length == 0; }
 }

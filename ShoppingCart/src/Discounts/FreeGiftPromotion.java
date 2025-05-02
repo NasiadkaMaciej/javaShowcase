@@ -11,7 +11,6 @@ import src.PromotionCommand;
  */
 public class FreeGiftPromotion implements PromotionCommand {
 	private final double threshold;
-	private boolean giftAdded = false;
 	private final Product giftProduct;
 
 	public FreeGiftPromotion(double threshold, String giftName) {
@@ -29,16 +28,15 @@ public class FreeGiftPromotion implements PromotionCommand {
 		// Check if the total order value exceeds the threshold
 		double total = Arrays.stream(products).mapToDouble(Product::getPrice).sum();
 
-		if (total >= threshold && !giftAdded) {
-			// Add the gift product to the array using the wrapper
+		// Check if the gift is already present in the cart
+		boolean hasGift = Arrays.stream(products).anyMatch(p -> p.getCode().startsWith("GIFT-"));
+
+		if (total >= threshold && !hasGift) {
 			productArray.addProduct(giftProduct);
-			giftAdded = true;
 			System.out.println("Free gift added: " + giftProduct.getName());
 		}
 	}
 
 	@Override
-	public void reset() {
-		giftAdded = false;
-	}
+	public void reset() {}
 }

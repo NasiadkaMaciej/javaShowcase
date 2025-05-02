@@ -26,8 +26,6 @@ public class ShoppingCart {
 
 	/**
 	 * Adds a product to the shopping cart and sorts the products.
-	 *
-	 * @param product the product to add
 	 */
 	public void addProduct(Product product) {
 		productArray.addProduct(product);
@@ -36,31 +34,14 @@ public class ShoppingCart {
 
 	/**
 	 * Removes a product from the shopping cart by its code.
-	 *
-	 * @param code the code of the product to remove
 	 */
 	public void removeProduct(String code) {
-		Product[] products = productArray.getProducts();
-		int index = -1;
-		for (int i = 0; i < products.length; i++) {
-			if (products[i].getCode().equals(code)) {
-				index = i;
-				break;
-			}
-		}
-
-		if (index != -1) {
-			Product[] newProducts = new Product[products.length - 1];
-			System.arraycopy(products, 0, newProducts, 0, index);
-			System.arraycopy(products, index + 1, newProducts, index, products.length - index - 1);
-			productArray.setProducts(newProducts);
-		}
+		productArray.removeProduct(code);
+		sortProducts();
 	}
 
 	/**
 	 * Sets the sorting strategy for the products and sorts them.
-	 *
-	 * @param sortingStrategy the comparator to use for sorting products
 	 */
 	public void setSortingStrategy(Comparator<Product> sortingStrategy) {
 		this.sortingStrategy = sortingStrategy;
@@ -76,121 +57,134 @@ public class ShoppingCart {
 		productArray.setProducts(products);
 	}
 
-	/**
-	 * Adds a promotion to the shopping cart.
-	 *
-	 * @param promotion the promotion to add
-	 */
 	public void addPromotion(PromotionCommand promotion) { promotions.add(promotion); }
 
+	public void removePromotion(PromotionCommand promotion) { promotions.remove(promotion); }
+
 	/**
-	 * Removes a promotion from the shopping cart and recalculates the total.
-	 *
-	 * @param promotion the promotion to remove
+	 * Calculates the total price after applying promotions in the optimal order
 	 */
-	public void removePromotion(PromotionCommand promotion) {
-		promotions.remove(promotion);
-		calculateTotal();
+	public double calculateTotal() {
+		if (productArray.isEmpty()) return 0.0;
+		return findOptimalPromotionApplication();
 	}
 
 	/**
-	 * Calculates the total price of the products in the cart after applying
-	 * promotions.
-	 *
-	 * @return the total price after discounts
+	 * Determines the optimal order to apply promotions to minimize the total cost.
 	 */
-	public double calculateTotal() {
-		Product[] products = productArray.getProducts();
-		if (products.length == 0) return 0.0;
-		resetDiscounts();
+	private double findOptimalPromotionApplication() {
+		if (promotions.size() <= 1) {
+			// If 0 or 1 promotion, just apply normally
+			resetAllDiscounts();
+			applyPromotions(promotions);
+			return sumDiscountPrices();
+		}
 
-		// Reset all promotions
+		// Try all possible permutations of promotion orders
+		List<List<PromotionCommand>> permutations = generatePermutations(promotions);
+		double lowestTotal = Double.MAX_VALUE;
+		List<PromotionCommand> bestOrder = null;
+
+		for (List<PromotionCommand> permutation : permutations) {
+			resetAllDiscounts();
+
+			// Apply promotions in this order
+			applyPromotions(permutation);
+
+			double total = sumDiscountPrices();
+			if (total < lowestTotal) {
+				lowestTotal = total;
+				bestOrder = permutation;
+			}
+		}
+
+		// Apply the best permutation one final time
+		resetAllDiscounts();
+		if (bestOrder != null) { applyPromotions(bestOrder); }
+
+		return lowestTotal;
+	}
+
+	private void applyPromotions(List<PromotionCommand> promotionsToApply) {
+		for (PromotionCommand promotion : promotionsToApply) {
+			promotion.apply(productArray);
+		}
+	}
+
+	private void resetAllDiscounts() {
 		for (PromotionCommand promotion : promotions) {
 			promotion.reset();
 		}
-
-		// Apply promotions in the order they were added
-		for (PromotionCommand promotion : promotions) {
-			promotion.apply(productArray);
-		}
-
-		return Arrays.stream(products).mapToDouble(Product::getDiscountPrice).sum();
-	}
-
-	/**
-	 * Resets the discount prices of all products to their original prices.
-	 */
-	private void resetDiscounts() {
 		for (Product product : productArray.getProducts()) {
 			product.resetDiscountPrice();
 		}
 	}
 
+	private double sumDiscountPrices() {
+		return Arrays.stream(productArray.getProducts()).mapToDouble(Product::getDiscountPrice).sum();
+	}
+
 	/**
-	 * Calculates the total price of the products before applying any promotions.
-	 *
-	 * @return the total price before discounts
+	 * Generates all possible permutations of the given list.
 	 */
+	private <T> List<List<T>> generatePermutations(List<T> list) {
+		List<List<T>> result = new ArrayList<>();
+		permuteHelper(new ArrayList<>(list), 0, result);
+		return result;
+	}
+
+	private <T> void permuteHelper(List<T> list, int start, List<List<T>> result) {
+		if (start == list.size() - 1) {
+			result.add(new ArrayList<>(list));
+			return;
+		}
+
+		for (int i = start; i < list.size(); i++) {
+			swap(list, start, i);
+			permuteHelper(list, start + 1, result);
+			swap(list, start, i); // backtrack
+		}
+	}
+
+	private <T> void swap(List<T> list, int i, int j) {
+		T temp = list.get(i);
+		list.set(i, list.get(j));
+		list.set(j, temp);
+	}
+
 	public double getTotalBeforePromotions() {
 		return Arrays.stream(productArray.getProducts()).mapToDouble(Product::getPrice).sum();
 	}
 
-	/**
-	 * Finds the cheapest product in the shopping cart.
-	 *
-	 * @return the cheapest product, or null if the cart is empty
-	 */
 	public Product findCheapestProduct() {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0) return null;
-		return Arrays.stream(products).min(Comparator.comparingDouble(Product::getPrice)).orElse(null);
+		if (productArray.isEmpty()) return null;
+		return Arrays.stream(products).min(ProductComparators.BY_PRICE_ASC).orElse(null);
 	}
 
-	/**
-	 * Finds the most expensive product in the shopping cart.
-	 *
-	 * @return the most expensive product, or null if the cart is empty
-	 */
 	public Product findMostExpensiveProduct() {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0) return null;
-		return Arrays.stream(products).max(Comparator.comparingDouble(Product::getPrice)).orElse(null);
+		if (productArray.isEmpty()) return null;
+		return Arrays.stream(products).max(ProductComparators.BY_PRICE_ASC).orElse(null);
 	}
 
-	/**
-	 * Finds the specified number of cheapest products in the shopping cart.
-	 *
-	 * @param n the number of cheapest products to find
-	 * @return an array of the n cheapest products
-	 */
 	public Product[] findNCheapestProducts(int n) {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0) return new Product[0];
+		if (productArray.isEmpty()) return new Product[0];
 		return Arrays.stream(products)
-		  .sorted(Comparator.comparingDouble(Product::getPrice))
+		  .sorted(ProductComparators.BY_PRICE_ASC)
 		  .limit(n)
 		  .toArray(Product[] ::new);
 	}
 
-	/**
-	 * Finds the specified number of most expensive products in the shopping cart.
-	 *
-	 * @param n the number of most expensive products to find
-	 * @return an array of the n most expensive products
-	 */
 	public Product[] findNMostExpensiveProducts(int n) {
 		Product[] products = productArray.getProducts();
-		if (products.length == 0) return new Product[0];
+		if (productArray.isEmpty()) return new Product[0];
 		return Arrays.stream(products)
-		  .sorted(Comparator.comparingDouble(Product::getPrice).reversed())
+		  .sorted(ProductComparators.BY_PRICE_DESC)
 		  .limit(n)
 		  .toArray(Product[] ::new);
 	}
 
-	/**
-	 * Returns the products in the shopping cart.
-	 *
-	 * @return an array of the products in the cart
-	 */
 	public Product[] getProducts() { return productArray.getProducts(); }
 }

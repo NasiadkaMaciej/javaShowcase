@@ -1,15 +1,14 @@
 package src.Discounts;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Arrays;
 import src.Product;
 import src.ProductArray;
+import src.ProductComparators;
 import src.PromotionCommand;
 
 /**
- * The Buy2Get3rdFree class implements a promotion where if a customer buys
- * multiple (n) sets of 3 products, they get the n cheapest products for free.
+ * Implements a "Buy 2 Get 3rd Free" promotion where for every 3 products,
+ * the cheapest one is free.
  */
 public class Buy2Get3rdFree implements PromotionCommand {
 
@@ -18,36 +17,28 @@ public class Buy2Get3rdFree implements PromotionCommand {
 		Product[] products = productArray.getProducts();
 		if (products.length < 3) return;
 
-		// Filter out FreeGiftPromotion products
-		List<IndexedProduct> eligibleProducts = new ArrayList<>();
-		for (int i = 0; i < products.length; i++) {
-			if (!(products[i].getCode().startsWith("GIFT-"))) {
-				eligibleProducts.add(new IndexedProduct(products[i], i));
+		// Filter out gift products and create a copy array
+		Product[] eligibleProducts =
+		  Arrays.stream(products).filter(p -> !p.getCode().startsWith("GIFT-")).toArray(Product[] ::new);
+
+		if (eligibleProducts.length < 3) return;
+
+		// Sort products by price (cheapest first) using the ProductComparators class
+		Arrays.sort(eligibleProducts, ProductComparators.BY_PRICE_ASC);
+
+		// Calculate how many free products to give (one per every 3 products)
+		int freeCount = eligibleProducts.length / 3;
+
+		// Make the cheapest products free
+		for (int i = 0; i < freeCount; i++) {
+			Product freeProduct = eligibleProducts[i];
+			// Find this product in the original array and set its discount price to 0
+			for (Product product : products) {
+				if (product.getCode().equals(freeProduct.getCode())) {
+					product.setDiscountPrice(0);
+					break;
+				}
 			}
-		}
-
-		// If we don't have at least 3 eligible products, exit
-		if (eligibleProducts.size() < 3) return;
-
-		// Calculate how many sets of 3 products we have from eligible products
-		int sets = eligibleProducts.size() / 3;
-
-		// Sort by price ascending to find the cheapest products
-		eligibleProducts.sort(Comparator.comparingDouble(p -> p.product.getPrice()));
-
-		// Make the cheapest 'sets' products free in the original array
-		for (int i = 0; i < sets; i++) {
-			products[eligibleProducts.get(i).index].setDiscountPrice(0);
-		}
-	}
-
-	private static class IndexedProduct {
-		Product product;
-		int index;
-
-		IndexedProduct(Product product, int index) {
-			this.product = product;
-			this.index = index;
 		}
 	}
 
